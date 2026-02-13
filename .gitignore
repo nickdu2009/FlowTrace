@@ -1,0 +1,51 @@
+# FlowTrace .gitignore
+
+## macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+## IntelliJ / Android Studio
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+## Gradle
+.gradle/
+**/build/
+**/.cxx/
+**/.externalNativeBuild/
+
+## Android
+*.apk
+*.aab
+*.keystore
+*.jks
+local.properties
+
+## Kotlin
+*.kotlin_module
+
+## Logs / temp / tooling
+*.log
+tmp/
+temp/
+.cache/
+
+## Sensitive / capture artifacts (MUST NOT COMMIT)
+**/*.p12
+**/*_ca.pem
+**/*_key.pem
+**/certs/
+**/captures/
+**/exports/
+**/sessions/
+**/bodies/
+
+## Cursor
+.cursor/
+
+## Misc
+android/_patch_test.txt
