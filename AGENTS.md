@@ -4,16 +4,17 @@
 
 ## 工程现状（2026-02-13）
 
-- 当前仓库以**文档与 Android 代码骨架**为主，尚未初始化完整 Android Gradle 工程。
+- 当前仓库以**文档与 Android 代码骨架**为主，尚未初始化完整 Android / iOS 工程。
 - 已沉淀的基线文档位于 `doc/`（见 `doc/README.md`）。
 - Android 分层骨架位于 `android/`（见 `android/README.md`）。
 
 ## 事实来源（Source of Truth）
 
 任何需求/决策/边界以文档为准：
-- **需求**：`doc/ANDROID_MVP_REQUIREMENTS.md`
+- **需求（Android）**：`doc/ANDROID_MVP_REQUIREMENTS.md`
+- **需求（iOS）**：`doc/IOS_MVP_REQUIREMENTS.md`
 - **技术栈**：`doc/TECH_STACK.md`
-- **关键决策（ADR）**：`doc/adr/ADR-0001-mvp-decisions.md`
+- **关键决策（ADR）**：`doc/adr/*`
 - **架构**：`doc/ARCHITECTURE.md`
 - **事件协议**：`doc/EVENT_PROTOCOL.md`
 - **实施计划**：`doc/MVP_IMPLEMENTATION_PLAN.md`
@@ -23,12 +24,15 @@
 ## MVP 目标与硬约束
 
 - **最低支持**：Android 8.0（API 26 / `minSdk=26`）
+- **最低支持（iOS）**：iOS 15.0
 - **抓包方式**：非 Root，`VpnService` + TUN
+- **抓包方式（iOS）**：`NetworkExtension` + `NEPacketTunnelProvider`
 - **抓包内核**：SunnyNet（Android Tun(VPN) 驱动）
 - **接入方式**：JNI `.so` **同进程直连**
 - **协议范围（MVP）**：HTTP / HTTPS（尽可能明文）/ WebSocket
 - **安全默认值**：默认脱敏；导出 HAR 默认脱敏
 - **性能策略**：有界队列 + 背压 + 批处理落盘 + Body 分离存储
+- **共享核心**：Shared Core（KMP）共享 Domain/Application/Event/Redactor/Export models（见 `doc/adr/ADR-0003-shared-core-kmp.md`）
 
 ## 分层与边界（必须遵守）
 
@@ -83,6 +87,7 @@ flowchart TB
   - 新增或更新 `doc/adr/ADR-xxxx-*.md`
   - 更新 `doc/README.md` 索引（如新增文档）
 - **需求范围变化**：更新 `doc/ANDROID_MVP_REQUIREMENTS.md` 与验收标准（AC）。
+- **需求范围变化（iOS）**：更新 `doc/IOS_MVP_REQUIREMENTS.md` 与验收标准（AC）。
 
 ## 实现需求的标准工作流（必须遵守）
 
@@ -90,7 +95,7 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-  R["需求条目（ANDROID_MVP_REQUIREMENTS.md）"] --> C{"是否改变范围/约束/取舍?"}
+  R["需求条目（ANDROID_MVP_REQUIREMENTS.md / IOS_MVP_REQUIREMENTS.md）"] --> C{"是否改变范围/约束/取舍?"}
   C -- Yes --> ADR["更新/新增 ADR（doc/adr/）"]
   C -- No --> D["设计产物（接口/事件/存储/状态机）"]
   ADR --> D
@@ -171,7 +176,7 @@ flowchart TD
 
 ### 文档优先级（冲突时以此为准）
 
-1. `doc/ANDROID_MVP_REQUIREMENTS.md`（范围与验收 AC）
+1. `doc/ANDROID_MVP_REQUIREMENTS.md` 与 `doc/IOS_MVP_REQUIREMENTS.md`（范围与验收 AC，按平台）
 2. `doc/adr/*`（关键决策与取舍）
 3. `doc/TECH_STACK.md`（技术栈与版本约束）
 4. `doc/ARCHITECTURE.md`（分层/线程/背压/存储策略）
@@ -181,7 +186,7 @@ flowchart TD
 
 ### 开始任何实现前的“必读清单”
 
-- 若要实现具体功能（FR/AC）：先读 `doc/ANDROID_MVP_REQUIREMENTS.md` 对应章节
+- 若要实现具体功能（FR/AC）：先读 `doc/ANDROID_MVP_REQUIREMENTS.md` 或 `doc/IOS_MVP_REQUIREMENTS.md` 对应章节
 - 若要更改默认行为/约束/取舍：先读并更新 `doc/adr/*`
 - 若涉及 VPN/JNI/背压/存储：同步对照 `doc/ARCHITECTURE.md` 与 `doc/EVENT_PROTOCOL.md`
 
