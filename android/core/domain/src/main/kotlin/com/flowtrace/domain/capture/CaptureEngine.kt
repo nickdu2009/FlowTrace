@@ -72,3 +72,4 @@ sealed interface CaptureDecision {
     val bodyUtf8: String,
   ) : CaptureDecision
 }
+

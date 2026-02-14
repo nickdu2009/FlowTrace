@@ -18,3 +18,4 @@ data class Timing(
   /** 响应体下载耗时 */
   val downloadMs: Long? = null,
 )
+

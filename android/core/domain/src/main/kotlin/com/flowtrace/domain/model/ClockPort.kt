@@ -13,3 +13,4 @@ interface ClockPort {
   /** 返回当前时间戳（毫秒，UTC epoch） */
   fun nowMillis(): Long
 }
+

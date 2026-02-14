@@ -34,7 +34,7 @@ sealed interface RuleAction {
   ) : RuleAction
 
   /**
-   * MVP: Only apply to text/* or application/json.
+   * MVP: Only apply to text/ * (any subtype) or application/json.
    */
   data class ReplaceBody(
     val contentTypePrefix: String,

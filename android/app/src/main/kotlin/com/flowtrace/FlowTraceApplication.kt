@@ -18,3 +18,4 @@ class FlowTraceApplication : Application() {
     Timber.d("FlowTrace Application started")
   }
 }
+

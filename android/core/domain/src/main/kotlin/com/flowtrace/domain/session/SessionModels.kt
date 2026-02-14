@@ -66,3 +66,4 @@ data class BodyRef(
   val truncated: Boolean,
   val previewUtf8: String?,
 )
+

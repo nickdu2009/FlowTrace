@@ -34,3 +34,4 @@ interface Redactor {
   /** 对文本内容做脱敏（URL query 中可能含 token 等） */
   fun redactText(text: String, policy: RedactionPolicy): String
 }
+

@@ -35,3 +35,4 @@ interface BodyStorePort {
    */
   suspend fun enforceRetention(maxTotalBytes: Long): Result<Long>
 }
+

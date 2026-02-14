@@ -12,15 +12,14 @@
 
 ## 前置条件（必须）
 
-### Java 17
+### JDK（建议 17+，当前已验证 25）
 
-当前系统使用 Java 25，但 Gradle 8.5 内嵌的 Kotlin 无法识别。**必须安装 Java 17**：
+本工程默认以 **JDK 17+** 为基线（Android/Gradle 生态最常见）。
+
+当前仓库已完成对 **JDK 25（Java 25.0.1）** 的构建验证：通过 **Gradle 9.1 + Kotlin 2.3.0** 配置即可正常编译。
 
 ```bash
-# macOS (Homebrew)
-brew install --cask temurin@17
-
-# 验证安装
+# 查看本机已安装 JDK
 /usr/libexec/java_home -V
 
 # 设置 JAVA_HOME（临时，针对本次构建）
@@ -30,7 +29,9 @@ export JAVA_HOME=`/usr/libexec/java_home -v 17`
 export JAVA_HOME=`/usr/libexec/java_home -v 17`
 ```
 
-##构建与运行
+> 备注：如果你希望继续使用系统自带/已安装的 **JDK 25**，无需切换 JAVA_HOME。
+
+## 构建与运行
 
 ```bash
 # 验证构建系统
@@ -48,15 +49,16 @@ export JAVA_HOME=`/usr/libexec/java_home -v 17`
 
 ## 技术栈（已配置）
 
-- **Kotlin**: 2.0.21
-- **Gradle**: 8.5
+- **Kotlin**: 2.3.0
+- **Gradle Wrapper**: 9.1.0
 - **AGP**: 8.7.3
 - **Compose BOM**: 2024.12.01
-- **Hilt**: 2.54
+- **Hilt**: 2.57.2
 - **Room**: 2.6.1
 - **Coroutines**: 1.10.1
 - **Min SDK**: 26 (Android 8.0)
-- **Target/Compile SDK**: 34
+- **Target SDK**: 34
+- **Compile SDK**: 35
 
 ## 下一步（实现里程碑 m2-m5）
 
@@ -93,11 +95,13 @@ export JAVA_HOME=`/usr/libexec/java_home -v 17`
 
 ### Java 版本错误
 
-**现象**：`./gradlew` 报错 `25.0.1` 或 `IllegalArgumentException`
+**现象**：`./gradlew` 报错 `IllegalArgumentException: 25.0.1`
 
-**原因**：Gradle 内嵌 Kotlin 不识别 Java 25
+**原因**：在较旧 Gradle/Kotlin 组合下，Kotlin 编译器（daemon）会在解析 Java 25 版本字符串时异常。
 
-**解决**：安装并切换到 Java 17（见"前置条件"）
+**解决**：
+- 本仓库当前已升级到 **Gradle 9.1 + Kotlin 2.3.0**，并通过 `kotlin.compiler.execution.strategy=in-process` 规避 daemon 启动问题
+- 若你回退到旧版本（例如 Gradle 8.5），请切换到 **JDK 17**（见“前置条件”）
 
 ### Gradle Daemon 卡死
 

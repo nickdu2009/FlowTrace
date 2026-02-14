@@ -37,8 +37,10 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
 
-  kotlinOptions {
-    jvmTarget = "17"
+  kotlin {
+    compilerOptions {
+      jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
   }
 
   buildFeatures {
@@ -82,6 +84,10 @@ dependencies {
   // Hilt
   implementation(libs.hilt.android)
   ksp(libs.hilt.compiler)
+  // Fix: Hilt/Dagger metadata parsing for Kotlin 2.3.x
+  // See: "Provided Metadata instance has version 2.3.0, while maximum supported version is 2.2.0"
+  ksp(libs.kotlin.metadata.jvm)
+  annotationProcessor(libs.kotlin.metadata.jvm)
   implementation(libs.hilt.navigation.compose)
 
   // Logging

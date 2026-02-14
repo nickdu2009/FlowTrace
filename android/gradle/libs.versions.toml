@@ -2,9 +2,9 @@
 # SDK & Language
 minSdk = "26"
 targetSdk = "34"
-compileSdk = "34"
-kotlin = "2.0.21"
-ksp = "2.0.21-1.0.28"
+compileSdk = "35"
+kotlin = "2.3.0"
+ksp = "2.3.0"
 
 # Android & Compose
 agp = "8.7.3"
@@ -14,7 +14,7 @@ activity-compose = "1.9.3"
 lifecycle = "2.8.7"
 
 # Dependency Injection
-hilt = "2.54"
+hilt = "2.57.2"
 hilt-navigation-compose = "1.2.0"
 
 # Coroutines & Flow
@@ -32,6 +32,7 @@ timber = "5.0.1"
 [libraries]
 # Kotlin
 kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kotlin-metadata-jvm = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
 

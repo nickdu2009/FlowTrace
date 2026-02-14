@@ -9,3 +9,4 @@ interface RuleRepository {
   suspend fun delete(id: RuleId): Result<Unit>
 }
 
+

@@ -96,3 +96,4 @@ data class WsDisconnected(
   override val url: String?,
   val reason: String?,
 ) : WsEvent
+
