@@ -5,7 +5,7 @@ import com.flowtrace.application.StopCaptureUseCase
 import com.flowtrace.capture.InMemorySessionAggregator
 import com.flowtrace.domain.capture.CaptureEngine
 import com.flowtrace.domain.capture.SessionAggregator
-import com.flowtrace.infra.sunnynet.FakeSunnyNetCaptureEngine
+import com.flowtrace.infra.sunnynet.SunnyNetCaptureEngine
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -19,7 +19,7 @@ abstract class AppBindingsModule {
 
   @Binds
   @Singleton
-  abstract fun bindCaptureEngine(impl: FakeSunnyNetCaptureEngine): CaptureEngine
+  abstract fun bindCaptureEngine(impl: SunnyNetCaptureEngine): CaptureEngine
 
   @Binds
   @Singleton
