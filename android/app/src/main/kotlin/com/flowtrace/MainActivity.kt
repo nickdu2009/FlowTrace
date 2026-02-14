@@ -1,9 +1,12 @@
 package com.flowtrace
 
+import android.content.Intent
+import android.net.VpnService
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +35,14 @@ import com.flowtrace.domain.capture.CaptureState
 class MainActivity : ComponentActivity() {
   private val vm: MainViewModel by viewModels()
 
+  private val vpnPermissionLauncher = registerForActivityResult(
+    ActivityResultContracts.StartActivityForResult()
+  ) { result ->
+    if (result.resultCode == RESULT_OK) {
+      vm.startService()
+    }
+  }
+
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
@@ -47,17 +58,34 @@ class MainActivity : ComponentActivity() {
                 .padding(innerPadding),
               contentAlignment = Alignment.Center
             ) {
-              MainScreen(vm = vm)
+              MainScreen(
+                vm = vm,
+                requestVpnPermissionAndStart = { requestVpnPermissionAndStart() },
+              )
             }
           }
         }
       }
     }
   }
+
+  private fun requestVpnPermissionAndStart() {
+    val intent: Intent? = VpnService.prepare(this)
+    if (intent == null) {
+      // Already granted
+      vm.startService()
+    } else {
+      vpnPermissionLauncher.launch(intent)
+    }
+  }
 }
 
 @Composable
-fun MainScreen(vm: MainViewModel, modifier: Modifier = Modifier) {
+fun MainScreen(
+  vm: MainViewModel,
+  requestVpnPermissionAndStart: () -> Unit,
+  modifier: Modifier = Modifier,
+) {
   val state by vm.state.collectAsState()
   val sessions by vm.sessions.collectAsState()
 
@@ -69,12 +97,12 @@ fun MainScreen(vm: MainViewModel, modifier: Modifier = Modifier) {
     Text(text = "Capture: $state", style = MaterialTheme.typography.titleMedium)
     Row(modifier = Modifier.padding(top = 12.dp)) {
       Button(
-        onClick = { vm.start() },
+        onClick = requestVpnPermissionAndStart,
         enabled = state == CaptureState.IDLE || state == CaptureState.ERROR,
       ) { Text("Start") }
       Box(modifier = Modifier.padding(horizontal = 8.dp))
       Button(
-        onClick = { vm.stop() },
+        onClick = { vm.stopService() },
         enabled = state == CaptureState.RUNNING || state == CaptureState.STARTING,
       ) { Text("Stop") }
     }

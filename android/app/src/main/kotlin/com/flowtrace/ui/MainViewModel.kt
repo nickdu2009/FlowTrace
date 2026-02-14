@@ -1,8 +1,10 @@
 package com.flowtrace.ui
 
+import android.app.Application
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.flowtrace.capture.CaptureRuntime
+import com.flowtrace.capture.VpnCaptureService
 import com.flowtrace.domain.capture.CaptureState
 import com.flowtrace.domain.capture.SessionAggregator
 import com.flowtrace.domain.session.SessionSummary
@@ -15,7 +17,8 @@ import kotlinx.coroutines.flow.stateIn
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-  private val runtime: CaptureRuntime,
+  private val app: Application,
+  private val runtime: com.flowtrace.capture.CaptureRuntime,
   aggregator: SessionAggregator,
 ) : ViewModel() {
 
@@ -25,7 +28,18 @@ class MainViewModel @Inject constructor(
     .map { it }
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
-  fun start() = runtime.start()
-  fun stop() = runtime.stop()
+  fun startService() {
+    val intent = android.content.Intent(app, VpnCaptureService::class.java).apply {
+      action = VpnCaptureService.Actions.START_CAPTURE
+    }
+    ContextCompat.startForegroundService(app, intent)
+  }
+
+  fun stopService() {
+    val intent = android.content.Intent(app, VpnCaptureService::class.java).apply {
+      action = VpnCaptureService.Actions.STOP_CAPTURE
+    }
+    app.startService(intent)
+  }
 }
 

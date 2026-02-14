@@ -6,9 +6,12 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.Network
 import android.net.VpnService
 import android.os.Build
 import android.os.IBinder
+import android.os.ParcelFileDescriptor
 import androidx.core.app.NotificationCompat
 import com.flowtrace.MainActivity
 import com.flowtrace.R
@@ -32,6 +35,8 @@ class VpnCaptureService : VpnService() {
 
   @Inject lateinit var runtime: CaptureRuntime
 
+  private var tunFd: ParcelFileDescriptor? = null
+
   override fun onBind(intent: Intent?): IBinder? = null
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -45,20 +50,84 @@ class VpnCaptureService : VpnService() {
 
   override fun onDestroy() {
     runCatching { runtime.stop() }
+    closeTun()
     super.onDestroy()
+  }
+
+  override fun onRevoke() {
+    Timber.w("VPN permission revoked by system")
+    runtime.stop()
+    closeTun()
+    stopForeground(STOP_FOREGROUND_REMOVE)
+    stopSelf()
+    super.onRevoke()
   }
 
   private fun startCapture() {
     Timber.i("Start capture requested")
     startForeground(Notifications.ID, Notifications.build(this, runtime.state.value))
+    establishTunIfNeeded()
     runtime.start()
   }
 
   private fun stopCapture() {
     Timber.i("Stop capture requested")
     runtime.stop()
+    closeTun()
     stopForeground(STOP_FOREGROUND_REMOVE)
     stopSelf()
+  }
+
+  /**
+   * MVP-3: establish a minimal TUN interface.
+   *
+   * IMPORTANT:
+   * - We do NOT forward packets yet (SunnyNet not wired), so we must avoid
+   *   routing all device traffic into the VPN.
+   * - For safety, we default to only capturing this app's traffic.
+   */
+  private fun establishTunIfNeeded() {
+    if (tunFd != null) return
+
+    val builder = Builder()
+      .setSession("FlowTrace Capture")
+      .setMtu(1500)
+      .addAddress("10.0.0.2", 32)
+      .addRoute("0.0.0.0", 0)
+      .addDnsServer("8.8.8.8")
+      .setConfigureIntent(
+        PendingIntent.getActivity(
+          this,
+          0,
+          Intent(this, MainActivity::class.java),
+          PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+      )
+
+    // Safety: allow only this app by default to avoid breaking network for other apps.
+    runCatching { builder.addAllowedApplication(packageName) }
+      .onFailure { Timber.w(it, "Failed to addAllowedApplication(%s)", packageName) }
+
+    // Prefer using the current active network as underlying, when available.
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+      val n: Network? = cm.activeNetwork
+      if (n != null) builder.setUnderlyingNetworks(arrayOf(n))
+    }
+
+    tunFd = builder.establish()
+    if (tunFd == null) {
+      Timber.e("Failed to establish TUN interface")
+    } else {
+      Timber.i("TUN established: fd=%d", tunFd!!.fd)
+    }
+  }
+
+  private fun closeTun() {
+    tunFd?.let {
+      runCatching { it.close() }
+    }
+    tunFd = null
   }
 
   object Actions {
