@@ -2,6 +2,7 @@ package com.flowtrace.domain.capture
 
 import com.flowtrace.domain.model.AppId
 import com.flowtrace.domain.model.SessionId
+import com.flowtrace.domain.model.WsDirection
 import com.flowtrace.domain.session.BodyRef
 
 sealed interface CaptureEvent {
@@ -26,7 +27,8 @@ data class HttpRequestStarted(
   override val url: String?,
   override val host: String?,
   val protocol: String?,
-  val headers: Map<String, String>,
+  /** HTTP headers 允许同名重复（如 Set-Cookie），因此使用 List<Pair> */
+  val headers: List<Pair<String, String>>,
   val body: BodyRef?,
 ) : HttpEvent
 
@@ -41,10 +43,13 @@ data class HttpResponseCompleted(
   val protocol: String?,
   val statusCode: Int?,
   val statusText: String?,
-  val headers: Map<String, String>,
+  /** HTTP headers 允许同名重复（如 Set-Cookie），因此使用 List<Pair> */
+  val headers: List<Pair<String, String>>,
   val body: BodyRef?,
   val serverAddress: String?,
   val tlsDecrypted: Boolean,
+  /** 网络分阶段耗时（能拿到多少填多少，字段可为 null） */
+  val timing: Timing?,
 ) : HttpEvent
 
 data class HttpRequestFailed(
@@ -56,6 +61,8 @@ data class HttpRequestFailed(
   override val url: String?,
   override val host: String?,
   val errorMessage: String,
+  /** 失败所在阶段（dns/connect/tls/transfer 等），能拿到时填写 */
+  val failureStage: String?,
 ) : HttpEvent
 
 sealed interface WsEvent : CaptureEvent {
@@ -89,6 +96,3 @@ data class WsDisconnected(
   override val url: String?,
   val reason: String?,
 ) : WsEvent
-
-enum class WsDirection { CLIENT_TO_SERVER, SERVER_TO_CLIENT }
-

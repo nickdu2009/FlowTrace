@@ -1,7 +1,9 @@
 package com.flowtrace.domain.session
 
+import com.flowtrace.domain.capture.Timing
 import com.flowtrace.domain.model.AppId
 import com.flowtrace.domain.model.SessionId
+import com.flowtrace.domain.model.WsDirection
 
 /**
  * SessionSummary is optimized for list rendering and indexing.
@@ -29,13 +31,16 @@ data class SessionDetail(
   val request: HttpMessage?,
   val response: HttpMessage?,
   val websocketMessages: List<WsMessage>,
+  /** 网络分阶段耗时 */
+  val timing: Timing?,
   val notes: Map<String, String>,
 )
 
 data class HttpMessage(
   val protocol: String?,
   val url: String?,
-  val headers: Map<String, String>,
+  /** HTTP headers 允许同名重复（如 Set-Cookie），因此使用 List<Pair> */
+  val headers: List<Pair<String, String>>,
   val body: BodyRef?,
 )
 
@@ -45,8 +50,6 @@ data class WsMessage(
   val messageType: Int?,
   val body: BodyRef?,
 )
-
-enum class WsDirection { CLIENT_TO_SERVER, SERVER_TO_CLIENT }
 
 data class RuleHit(
   val ruleId: String,
@@ -63,4 +66,3 @@ data class BodyRef(
   val truncated: Boolean,
   val previewUtf8: String?,
 )
-
