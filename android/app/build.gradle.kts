@@ -70,6 +70,7 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(libs.androidx.lifecycle.viewmodel.ktx)
+  implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
 
   // Compose
   val composeBom = platform(libs.compose.bom)

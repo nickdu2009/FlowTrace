@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-  <!-- VPN 权限（抓包核心） -->
-  <uses-permission android:name="android.permission.BIND_VPN_SERVICE" />
   <!-- 前台服务通知 -->
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
   <!-- 网络状态监听 -->
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
   <!-- 互联网访问 -->
@@ -27,6 +26,17 @@
         <category android:name="android.intent.category.LAUNCHER" />
       </intent-filter>
     </activity>
+
+    <service
+      android:name=".capture.VpnCaptureService"
+      android:exported="false"
+      android:permission="android.permission.BIND_VPN_SERVICE"
+      android:foregroundServiceType="specialUse">
+      <intent-filter>
+        <action android:name="com.flowtrace.action.START_CAPTURE" />
+        <action android:name="com.flowtrace.action.STOP_CAPTURE" />
+      </intent-filter>
+    </service>
 
   </application>
 

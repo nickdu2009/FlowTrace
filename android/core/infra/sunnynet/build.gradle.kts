@@ -41,4 +41,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.android)
   implementation(libs.androidx.core.ktx)
   implementation(libs.timber)
+
+  // DI annotations (provided by app)
+  compileOnly("javax.inject:javax.inject:1")
 }
