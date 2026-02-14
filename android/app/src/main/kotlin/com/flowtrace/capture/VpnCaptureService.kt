@@ -16,6 +16,7 @@ import androidx.core.app.NotificationCompat
 import com.flowtrace.MainActivity
 import com.flowtrace.R
 import com.flowtrace.domain.capture.CaptureState
+import com.flowtrace.infra.sunnynet.TunFdProvider
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import timber.log.Timber
@@ -34,6 +35,7 @@ import timber.log.Timber
 class VpnCaptureService : VpnService() {
 
   @Inject lateinit var runtime: CaptureRuntime
+  @Inject lateinit var tunFdProvider: TunFdProvider
 
   private var tunFd: ParcelFileDescriptor? = null
 
@@ -120,6 +122,7 @@ class VpnCaptureService : VpnService() {
       Timber.e("Failed to establish TUN interface")
     } else {
       Timber.i("TUN established: fd=%d", tunFd!!.fd)
+      tunFdProvider.set(tunFd!!.fd)
     }
   }
 
@@ -128,6 +131,7 @@ class VpnCaptureService : VpnService() {
       runCatching { it.close() }
     }
     tunFd = null
+    tunFdProvider.clear()
   }
 
   object Actions {

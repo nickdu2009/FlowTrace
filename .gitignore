@@ -25,6 +25,15 @@ out/
 *.jks
 local.properties
 
+## Native libs (generated locally, do not commit)
+android/app/src/main/jniLibs/**/libsunnynet.so
+android/app/src/main/jniLibs/**/*.so
+android/app/src/main/jniLibs/**/libsunnynet.h
+
+## Third-party build sources/artifacts (generated locally)
+third_party/
+scripts/.cache/
+
 ## Kotlin
 *.kotlin_module
 

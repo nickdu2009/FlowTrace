@@ -6,6 +6,8 @@ package com.flowtrace.infra.sunnynet
  * It intentionally does not expose domain models to keep native dependencies isolated.
  */
 interface SunnyNetBridge {
+  fun setCallback(context: Long, callback: Any): Boolean
+
   fun createContext(): Long
   fun releaseContext(context: Long): Boolean
 
@@ -29,6 +31,23 @@ interface SunnyNetBridge {
   fun processDelName(context: Long, name: String)
   fun processAddPid(context: Long, pid: Int)
   fun processDelPid(context: Long, pid: Int)
+
+  /**
+   * Android Tun(VPN): pass established TUN file descriptor to native.
+   *
+   * SunnyNet official tun driver reads packets from this fd.
+   */
+  fun setTunFd(fd: Int): Boolean
+
+  // --- HTTP/WS helpers (best-effort, may be empty) ---
+  fun getRequestProto(messageId: Long): String
+  fun getResponseProto(messageId: Long): String
+  fun getRequestAllHeader(messageId: Long): String
+  fun getResponseAllHeader(messageId: Long): String
+  fun getResponseStatusCode(messageId: Long): Int
+  fun getResponseStatus(messageId: Long): String
+  fun getResponseServerAddress(messageId: Long): String
+  fun getWebsocketBody(messageId: Long): ByteArray
 }
 
 
